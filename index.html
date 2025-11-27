@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Trabalho do Kauan — Física Quântica Interativa</title>
+  <style>
+    :root{--bg:#0f1724;--card:#0b1220;--accent:#7dd3fc;--muted:#94a3b8;--glass:rgba(255,255,255,0.03)}
+    *{box-sizing:border-box;font-family:Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial}
+    body{margin:0;background:linear-gradient(180deg,#071028 0%, #081027 60%);color:#e6eef8;min-height:100vh}
+    header{padding:28px 24px;border-bottom:1px solid rgba(255,255,255,0.03);display:flex;align-items:center;gap:18px}
+    header h1{font-size:20px;margin:0}
+    .container{max-width:1100px;margin:28px auto;padding:0 20px}
+    .grid{display:grid;grid-template-columns:1fr 420px;gap:20px}
+    .card{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 6px 18px rgba(2,6,23,0.6)}
+    .small{font-size:13px;color:var(--muted)}
+    .controls{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+    label{font-size:13px;color:var(--muted)}
+    input[type=range]{width:100%}
+    canvas{width:100%;height:250px;background:linear-gradient(90deg, rgba(255,255,255,0.02), transparent);border-radius:8px}
+    .footer{margin-top:18px;font-size:13px;color:var(--muted)}
+    button{background:var(--accent);border:none;padding:8px 10px;border-radius:8px;color:#001122;font-weight:600;cursor:pointer}
+    .eq{background:var(--glass);padding:10px;border-radius:8px;margin:8px 0}
+    ul{margin:8px 0 0 18px}
+    @media(max-width:980px){.grid{grid-template-columns:1fr;}.card{padding:12px}}
+  </style>
+</head>
+<body>
+  <header>
+    <div style="width:54px;height:54px;background:linear-gradient(135deg,#0369a1,#7dd3fc);border-radius:10px;display:grid;place-items:center;font-weight:700;color:#001022">Q</div>
+    <div>
+      <h1>Trabalho do Kauan — Física Quântica</h1>
+      <div class="small">Explicações curtas, demonstrações e experimentos interativos em JavaScript</div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="grid">
+      <section class="card">
+        <h2>Introdução rápida</h2>
+        <p class="small">Este é o <strong>Trabalho do Kauan</strong> sobre Física Quântica. Aqui você vai encontrar explicações revisadas e muito mais completas, apresentando conceitos fundamentais de um jeito bem claro. Abaixo estão simulações visuais melhoradas que mostram como funcionam <strong>funções de onda</strong> e <strong>qubits</strong>, dois pilares essenciais da mecânica quântica.</p>
+
+        <div class="eq">
+          <strong>Função de Onda (1D) — Fórmula Correta:</strong>
+          <div class="small">\(\Psi(x,t) = A\sin(kx - \omega t + \phi)\)</div>
+        </div>
+
+        <h3>Conceitos-chave</h3>
+        <ul>
+          <li><strong>Função de onda</strong> — descreve amplitude complexa; o quadrado do módulo dá a probabilidade.</li>
+          <li><strong>Probabilidade</strong> — \(|\Psi|^2\) é o que podemos medir como distribuição de posição.</li>
+          <li><strong>Qubit</strong> — o análogo quântico de um bit; pode estar em superposição \(|0\rangle\) e \(|1\rangle\).</li>
+        </ul>
+
+        <h3>Atalhos</h3>
+        <div class="small">Use os controles à direita para mudar comprimento de onda, fase e ver como a densidade de probabilidade muda. Use o simulador de qubit para rotacionar o estado no "espaço Bloch".</div>
+
+        <div class="footer">Feito com HTML, CSS e JavaScript — Experimente e compartilhe!</div>
+      </section>
+
+      <aside>
+        <div class="card" style="margin-bottom:16px">
+          <h3>Função de Onda — Visualização Correta</h3>
+          <canvas id="waveCanvas"></canvas>
+          <div class="controls">
+            <div>
+              <label>Comprimento de onda (λ): <span id="lambdaVal">120</span> px</label>
+              <input id="lambda" type="range" min="40" max="300" value="120">
+            </div>
+            <div>
+              <label>Fase (φ): <span id="phaseVal">0</span> rad</label>
+              <input id="phase" type="range" min="0" max="6.283" step="0.01" value="0">
+            </div>
+            <div>
+              <label>Amplitude (A): <span id="ampVal">1.0</span></label>
+              <input id="amp" type="range" min="0.2" max="2" step="0.01" value="1">
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <button id="toggleAnimate">Parar</button>
+              <button id="randomize">Randomizar</button>
+            </div>
+          </div>
+          <div class="small" style="margin-top:10px">A linha representa Re(Ψ). A área sombreada é a densidade de probabilidade |Ψ|².</div>
+        </div>
+
+        <div class="card">
+          <h3>Simulador de Qubit (Bloch)</h3>
+          <canvas id="bloch" width="380" height="300" style="width:100%;height:220px;border-radius:8px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent)"></canvas>
+          <div class="controls">
+            <label>Ângulo θ (polar): <span id="thetaVal">1.0</span> rad</label>
+            <input id="theta" type="range" min="0" max="3.1416" step="0.01" value="1">
+            <label>Ângulo φ (azimute): <span id="phiVal">0.0</span> rad</label>
+            <input id="phi" type="range" min="0" max="6.283" step="0.01" value="0">
+            <div style="display:flex;gap:8px"><button id="measure">Medir</button><div id="measureResult" class="small"></div></div>
+          </div>
+          <div class="small" style="margin-top:10px">A probabilidade de obter |0⟩ é cos²(θ/2) e de |1⟩ é sin²(θ/2).</div>
+        </div>
+      </aside>
+    </div>
+
+    <section class="card" style="margin-top:20px">
+      <h2>Quiz rápido</h2>
+      <p class="small">Teste seu entendimento com uma pergunta simples.</p>
+      <div style="display:flex;gap:10px;align-items:center">
+        <div class="small">Se θ = 0, qual é o estado do qubit?</div>
+        <div style="margin-left:auto"><button id="showAnswer">Mostrar resposta</button></div>
+      </div>
+      <div id="answer" class="small" style="margin-top:10px;display:none;background:var(--glass);padding:10px;border-radius:8px">Quando θ = 0, o estado é |0⟩ com probabilidade 1.</div>
+    </section>
+
+  </main>
+
+  <script>
+    // ---------- Função de onda (1D) ----------
+    const waveCanvas = document.getElementById('waveCanvas');
+    const wc = waveCanvas.getContext('2d');
+    let width = waveCanvas.width = waveCanvas.clientWidth * devicePixelRatio;
+    let height = waveCanvas.height = 250 * devicePixelRatio;
+
+    const lambda = document.getElementById('lambda');
+    const phase = document.getElementById('phase');
+    const amp = document.getElementById('amp');
+    const lambdaVal = document.getElementById('lambdaVal');
+    const phaseVal = document.getElementById('phaseVal');
+    const ampVal = document.getElementById('ampVal');
+    const toggleAnimate = document.getElementById('toggleAnimate');
+    const randomize = document.getElementById('randomize');
+
+    let t = 0; let animating = true;
+
+    function drawWave(){
+      width = waveCanvas.width = waveCanvas.clientWidth * devicePixelRatio;
+      height = waveCanvas.height = 250 * devicePixelRatio;
+      const A = parseFloat(amp.value);
+      const lam = parseFloat(lambda.value);
+      const phi = parseFloat(phase.value);
+
+      wc.clearRect(0,0,width,height);
+      // background grid
+      wc.fillStyle = 'rgba(255,255,255,0.01)';
+      wc.fillRect(0,0,width,height);
+
+      // draw axis
+      wc.strokeStyle = 'rgba(255,255,255,0.08)';
+      wc.lineWidth = 1 * devicePixelRatio;
+      wc.beginPath(); wc.moveTo(0,height/2); wc.lineTo(width,height/2); wc.stroke();
+
+      // wave (Re psi)
+      wc.beginPath();
+      for(let x=0;x<width;x+=2){
+        const k = (2*Math.PI)/lam;
+        const y = A * Math.sin(k*(x/devicePixelRatio) - 0.8*t + phi);
+        const py = height/2 - y*40*devicePixelRatio;
+        if(x===0) wc.moveTo(x,py); else wc.lineTo(x,py);
+      }
+      wc.strokeStyle = 'rgba(125,211,252,0.95)';
+      wc.lineWidth = 2*devicePixelRatio; wc.stroke();
+
+      // probability density |psi|^2 as filled area
+      wc.beginPath();
+      for(let x=0;x<width;x+=2){
+        const k = (2*Math.PI)/lam;
+        const y = A * Math.sin(k*(x/devicePixelRatio) - 0.8*t + phi);
+        const p = y*y; // proportional to probability
+        const py = height - (p*400*devicePixelRatio);
+        if(x===0) wc.moveTo(x,py); else wc.lineTo(x,py);
+      }
+      wc.lineTo(width, height); wc.lineTo(0,height); wc.closePath();
+      wc.fillStyle = 'rgba(125,211,252,0.08)'; wc.fill();
+
+      lambdaVal.textContent = lam;
+      phaseVal.textContent = parseFloat(phi).toFixed(2);
+      ampVal.textContent = parseFloat(A).toFixed(2);
+    }
+
+    function frame(){
+      if(animating) t += 0.06;
+      drawWave();
+      requestAnimationFrame(frame);
+    }
+    frame();
+
+    toggleAnimate.addEventListener('click', ()=>{animating = !animating; toggleAnimate.textContent = animating ? 'Parar' : 'Anima';});
+    randomize.addEventListener('click', ()=>{lambda.value = Math.floor(60+Math.random()*240);phase.value = (Math.random()*6.283).toFixed(2);amp.value = (0.3+Math.random()*1.7).toFixed(2);});
+    [lambda,phase,amp].forEach(inp=>inp.addEventListener('input', drawWave));
+
+    // ---------- Bloch sphere (simplified 2D projection) ----------
+    const bloch = document.getElementById('bloch');
+    const bctx = bloch.getContext('2d');
+    const theta = document.getElementById('theta');
+    const phi = document.getElementById('phi');
+    const thetaVal = document.getElementById('thetaVal');
+    const phiVal = document.getElementById('phiVal');
+    const measure = document.getElementById('measure');
+    const measureResult = document.getElementById('measureResult');
+
+    function drawBloch(){
+      const W = bloch.width; const H = bloch.height; bctx.clearRect(0,0,W,H);
+      // center
+      const cx = W/2; const cy = H/2; const R = Math.min(W,H)/2 - 30;
+      // outer circle
+      bctx.beginPath(); bctx.arc(cx,cy,R,0,Math.PI*2); bctx.strokeStyle='rgba(255,255,255,0.08)'; bctx.lineWidth=2; bctx.stroke();
+      // axes
+      bctx.strokeStyle='rgba(255,255,255,0.04)'; bctx.beginPath(); bctx.moveTo(cx-R,cy); bctx.lineTo(cx+R,cy); bctx.moveTo(cx,cy-R); bctx.lineTo(cx,cy+R); bctx.stroke();
+
+      const th = parseFloat(theta.value); const ph = parseFloat(phi.value);
+      thetaVal.textContent = th.toFixed(2); phiVal.textContent = ph.toFixed(2);
+
+      // convert spherical -> cartesian
+      const x = R * Math.sin(th) * Math.cos(ph);
+      const y = -R * Math.cos(th); // vertical
+      const z = R * Math.sin(th) * Math.sin(ph);
+
+      // draw state vector (projected 2D: x horizontal, y vertical)
+      bctx.beginPath(); bctx.moveTo(cx,cy); bctx.lineTo(cx + x, cy + y);
+      bctx.strokeStyle='rgba(125,211,252,0.9)'; bctx.lineWidth=3; bctx.stroke();
+      // head
+      bctx.beginPath(); bctx.arc(cx + x, cy + y, 6,0,Math.PI*2); bctx.fillStyle='rgba(125,211,252,0.95)'; bctx.fill();
+
+      // show coordinates small
+      bctx.fillStyle='rgba(255,255,255,0.8)'; bctx.font = '12px Inter, Arial';
+      bctx.fillText('x: '+(x/R).toFixed(2), 14, 18);
+      bctx.fillText('z: '+(z/R).toFixed(2), 14, 36);
+    }
+    [theta,phi].forEach(i=>i.addEventListener('input', drawBloch));
+    drawBloch();
+
+    measure.addEventListener('click', ()=>{
+      const th = parseFloat(theta.value);
+      const p0 = Math.cos(th/2)**2; const p1 = Math.sin(th/2)**2;
+      const rnd = Math.random();
+      const outcome = rnd < p0 ? '0' : '1';
+      measureResult.textContent = `Resultado: |${outcome}⟩ (P0=${(p0*100).toFixed(1)}%, P1=${(p1*100).toFixed(1)}%)`;
+    });
+
+    // Quiz
+    document.getElementById('showAnswer').addEventListener('click', ()=>{document.getElementById('answer').style.display='block'});
+
+    // Responsividade (redraw on resize)
+    window.addEventListener('resize', ()=>{drawWave();drawBloch();});
+
+    // small accessibility: keyboard shortcuts
+    window.addEventListener('keydown', (e)=>{
+      if(e.key === ' ') { e.preventDefault(); animating = !animating; toggleAnimate.textContent = animating ? 'Parar' : 'Anima'; }
+    });
+  </script>
+  <section class="extra-explanations">
+    <h2>Explicações Mais Simples</h2>
+    <div class="card">
+      <h3>O que é Física Quântica?</h3>
+      <p>A física quântica estuda coisas muito pequenas, como átomos e partículas. Nesse mundo pequeno, a matéria não funciona como no nosso dia a dia. As coisas podem estar em dois lugares ao mesmo tempo e só ganham um valor definido quando alguém mede.</p>
+    </div>
+    <div class="card">
+      <h3>O que é uma Função de Onda?</h3>
+      <p>A função de onda é um jeito de mostrar como uma partícula pode estar em vários lugares ao mesmo tempo. Ela não diz onde a partícula está, mas sim a probabilidade de encontrá‑la.</p>
+    </div>
+    <div class="card">
+      <h3>O que é um Qubit?</h3>
+      <p>Um qubit é como um bit de computador, mas muito mais poderoso. Em vez de ser só 0 ou 1, ele pode ser os dois ao mesmo tempo. Isso permite cálculos muito mais rápidos.</p>
+    </div>
+    <div class="card">
+      <h3>Superposição</h3>
+      <p>Superposição é quando uma partícula está em vários estados ao mesmo tempo. Só ao medir que ela “decide” qual estado vai assumir.</p>
+    </div>
+    <div class="card">
+      <h3>Interferência</h3>
+      <p>Quando duas ondas se encontram, elas podem se somar ou se cancelar. As partículas quânticas se comportam como ondas, então também podem interferir.</p>
+    </div>
+  </section>
+</body>
+</html>
